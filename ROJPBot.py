@@ -199,7 +199,8 @@ def createStarboardEmbed(reaction):
     embed=discord.Embed(title="Starboard", color=0x00ff00)
     embed.add_field(name="Content", value=reaction.message.content,   inline=False)
     embed.add_field(name="Author", value=reaction.message.author.mention, inline=True)
-    embed.add_field(name="Channel", value=reaction.message.channel.mention)
+    embed.add_field(name="Channel", value=reaction.message.channel.mention, inline=True)
+    embed.add_field(name="Original Message", value="[Original]("+reaction.message.jump_url+")", inline=False)
     if reaction.custom_emoji:
         embed.set_footer(icon_url=reaction.emoji.url, text=str(reaction.count)+" "+reaction.emoji.name)
     else:
@@ -272,7 +273,7 @@ async def on_raw_reaction_add(payload):  #updates the starboard when the thresho
             print("How about here?")
             if not starboardJsonHasMessage(guildid, message.id):  #If the starboardJson currently does not contain the message, we create a new message to send to starboard_channel
                 embed = createStarboardEmbed(reaction) #Makes an embed containing all the pertinent info.
-                msg = await channel.send(embed=embed)  #We need to get the message id of the bot's message so that we can link the original message with the starboard message.
+                msg = await guild.get_channel(get_value(guildid, "starboard_channel")).send(embed=embed)  #We need to get the message id of the bot's message so that we can link the original message with the starboard message.
                 index = updateStarboardJson(message, msg, count) #Updates starboardJson with the message and corresponding starboard info, along with the number of reactions.
                 modifyleaderboard(guildid, message.author, index) #We then update the leaderboard.
             else:  #If the message already exists, we need to edit the message rather than start from scratch.
